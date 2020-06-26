@@ -1,4 +1,34 @@
-﻿body
-{
-    background-color: #ffffff;
+﻿body {
+    background-color: #808080;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    margin: 0.4em;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+.work_timer, .break_timer {
+    margin: 0.5em;
+}
+
+#wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#buttons, #timers {
+    display: flex;
+    flex-direction: row;
 }
