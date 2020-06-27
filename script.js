@@ -21,6 +21,7 @@ const PAUSE = "Pause";
 const RESUME = "Resume";
 const RESET = "Reset";
 
+// TODO add sound on done working and done with break
 class Pomodoro {
     constructor(countdownEl, msgEl) {
         this.countdownEl = countdownEl;
@@ -54,7 +55,6 @@ class Pomodoro {
             this.minutes = MAX_VALUE;
             this.seconds = MAX_VALUE;
         } else {
-            console.log("done");
             this.doneCounting = true;
         }
     }
@@ -81,13 +81,10 @@ class Pomodoro {
                     }
                 }
                 // TODO: bug, there is a second in between
-                // TODO: done counting keeps going
                 self._decrementTimer();
                 self._updateCountdownText();
             }
         }, MILLISECONDS);
-
-        console.log(this.timeInterval);
     }
 
     toggleTimer() {
@@ -186,7 +183,6 @@ pauseButton.addEventListener("click", function () {
     }
 })
 
-// Attach function to reset to given work and break times
 let resetButton = document.getElementById("reset");
 resetButton.addEventListener("click", function () {
     pomodoro.clearTimer();

@@ -1,23 +1,39 @@
-﻿body {
-    background-color: #808080;
+﻿/*TODO: add a dark mode*/
+
+body {
+    color: white;
+    background-color: hsla(184, 24%, 70%, 1);
+    /*    background-color: hsla(254, 16%, 22%, 1);*/
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 header {
+    color: white;
+    font-family: 'IBM Plex Serif', serif;
+    line-height: 1em;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding-top: 2em;
 }
 
 button {
+/*    background-color:*/
     margin: 0.4em;
+    border-radius: 10%;
+    min-height: 2em;
+    min-width: 6em;
+    font-variant: small-caps;
 }
 
 button:hover {
     cursor: pointer;
+    background-color: hsla(0, 0%, 80%, 0.7);
 }
 
 .work_timer, .break_timer {
+    color: black;
     margin: 0.5em;
 }
 
@@ -31,4 +47,22 @@ button:hover {
 #buttons, #timers {
     display: flex;
     flex-direction: row;
+}
+
+#countdown {
+    display: flex;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 3em;
+    color: rgba(0, 0, 0, 1.0);
+    background-color: hsla(0, 0%, 100%, 1);
+    padding: 0.3em;
+    border-radius: 50%;
+    height: 4.5em;
+    width: 4.5em;
+    justify-content: center;
+    align-items: center;
+}
+
+#msg {
+    font-size: 2em;
 }
