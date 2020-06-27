@@ -3,7 +3,7 @@
 const START_MSG = "Start Timer";
 const CONTINUE_MSG = "Continue Working";
 const BREAK_MSG = "Take a Break";
-const RESUME_MSG = "Paused Timer";
+const PAUSED_MSG = "Paused Timer";
 
 // Time
 const HOUR = 0;
@@ -27,57 +27,22 @@ class Pomodoro {
         this.clearTimer();
     }
 
-    setTime(h, m, s) {
+    _setTime(h, m, s) {
         this.hours = Math.min(h, MAX_VALUE);
         this.minutes = Math.min(m, MAX_VALUE);
         this.seconds = Math.min(s, MAX_VALUE);
-        this.timeIsSet = true;
-        this.updateCountdownText();
+        this._updateCountdownText();
     }
 
-    updateCountdownText() {
+    _updateCountdownText() {
         let h = formatTimeNum(this.hours);
         let m = formatTimeNum(this.minutes);
         let s = formatTimeNum(this.seconds);
         this.countdownEl.textContent = h + ":" + m + ":" + s;
     }
 
-    startTimer() {
-        this.timerOn = true;
-        this.msgEl.textContent = CONTINUE_MSG;
-
-        let self = this;
-        this.timeInterval = setInterval(function () {
-            if (self.timerOn) {
-                self.decrementTimer();
-                self.updateCountdownText();
-            }
-        }, MILLISECONDS);
-    };
-
-    toggleTimer() {
-        if (this.msgEl.textContent === CONTINUE_MSG) {
-            this.msgEl.textContent = RESUME_MSG;
-        } else {
-            this.msgEl.textContent = CONTINUE_MSG;
-        }
-        this.timerOn = !this.timerOn;
-    }
-
-    clearTimer() {
-        this.hours = 0;
-        this.minutes = 0;
-        this.seconds = 0;
-        this.timerOn = false;
-        this.timeIsSet = false;
-        this.updateCountdownText();
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-        }
-    }
-
     // Always decrements by 1 second
-    decrementTimer() {
+    _decrementTimer() {
         if (this.seconds > 0) {
             this.seconds -= 1;
         } else if (this.minutes > 0) {
@@ -88,12 +53,80 @@ class Pomodoro {
             this.minutes = MAX_VALUE;
             this.seconds = MAX_VALUE;
         } else {
-            return;
+            this.doneCounting = true;
         }
+    }
+
+    startTimer() {
+        this._setTime(this.workHours, this.workMinutes, this.workSeconds);
+        this.msgEl.textContent = CONTINUE_MSG;
+        this.doneCounting = false;
+        this.doneWorking = false;
+        this.doneBreak = false;
+
+        let self = this;
+        this.timeInterval = setInterval(function () {
+            // Todo: refactor
+            if (!self.paused) {
+                if (self.doneCounting) {
+                    if (!self.doneWorking) {
+                        self.doneWorking = true;
+                        self._setTime(self.breakHours, self.breakMinutes, self.breakSeconds);
+                        self.msgEl.textContent = BREAK_MSG;
+                        self.doneCounting = false;
+                    } else {
+                        self.doneBreak = true;
+                    }
+                }
+                self._decrementTimer();
+                self._updateCountdownText();
+            }
+        }, MILLISECONDS);
+    };
+
+    toggleTimer() {
+        if (this.msgEl.textContent === CONTINUE_MSG) {
+            this.msgEl.textContent = PAUSED_MSG;
+        } else {
+            this.msgEl.textContent = CONTINUE_MSG;
+        }
+        this.paused = !this.paused;
+    }
+
+    clearTimer() {
+        this._setTime(0, 0, 0);
+        this.setWorkTime(0, 0, 0);
+        this.setBreakTime(0, 0, 0);
+        this.paused = false;
+        this.doneCounting = true;
+        this.doneWorking = true;
+        this.doneBreak = true;
+
+        this.msgEl.textContent = START_MSG;
+        this._updateCountdownText();
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
+    }
+
+    setWorkTime(h, m, s) {
+        this.workHours = h;
+        this.workMinutes = m;
+        this.workSeconds = s;
+    }
+
+    setBreakTime(h, m, s) {
+        this.breakHours = h;
+        this.breakMinutes = m;
+        this.breakSeconds = s;
     }
 
     getTime() {
         return [this.hours, this.minutes, this.seconds];
+    }
+
+    isDone() {
+        return this.doneCounting && this.doneWorking && this.doneBreak;
     }
 }
 
@@ -108,6 +141,15 @@ function convertStrToNum(s) {
     }
     return num;
 }
+
+function getHoursAndMinutesFromInput(inputEl) {
+    let minuteStr = inputEl.value;
+    let minutes = convertStrToNum(minuteStr);
+    hours = (minutes / MIN_IN_HOUR) | 0; // integer division
+    minutes -= hours * MIN_IN_HOUR;
+    return [hours, minutes]
+}
+
 // Attach function to countdown on play hit if timer_state is paused
 let countdown = document.getElementById("countdown");
 let msg = document.getElementById("msg");
@@ -115,14 +157,14 @@ let pomodoro = new Pomodoro(countdown, msg);
 
 let startButton = document.getElementById("start");
 startButton.addEventListener("click", function () {
-    if (!pomodoro.timeIsSet) {
-        // If time is set and start is pressed again, continue counting down?
-        let minuteStr = document.getElementById("work_timer_input").value;
-        let minutes = convertStrToNum(minuteStr);
-        hours = (minutes / MIN_IN_HOUR) | 0; // integer division
-        minutes -= hours * MIN_IN_HOUR;
-        pomodoro.setTime(hours, minutes, 0);
-        pomodoro.startTimer();;
+    if (pomodoro.isDone()) {
+        let workTime = getHoursAndMinutesFromInput(document.getElementById("work_timer_input"));
+        pomodoro.setWorkTime(workTime[0], workTime[1], 0);
+
+        let breakTime = getHoursAndMinutesFromInput(document.getElementById("break_timer_input"));
+        pomodoro.setBreakTime(breakTime[0], breakTime[1], 0);
+
+        pomodoro.startTimer();
     }
 })
 
