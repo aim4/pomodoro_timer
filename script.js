@@ -16,6 +16,7 @@ const MILLISECONDS = 1000;
 
 // Timer buttons
 const START = "Start";
+const PAUSE = "Pause";
 const RESUME = "Resume";
 const RESET = "Reset";
 
@@ -26,14 +27,15 @@ class Pomodoro {
         this.minutes = 0;
         this.seconds = 0;
         this.timerOn = false;
+        this.timeIsSet = false;
     }
 
     setTime(h, m, s) {
         this.hours = Math.min(h, MAX_VALUE);
         this.minutes = Math.min(m, MAX_VALUE);
         this.seconds = Math.min(s, MAX_VALUE);
+        this.timeIsSet = true;
         this.updateCountdownText();
-        this.startTimer();
     }
 
     getTime() {
@@ -51,13 +53,15 @@ class Pomodoro {
         this.timerOn = true;
         let self = this;
         setInterval(function () {
-            self.decrementTimer();
-            self.updateCountdownText();
+            if (self.timerOn) {
+                self.decrementTimer();
+                self.updateCountdownText();
+            }
         }, MILLISECONDS);
     };
 
-    stopTimer() {
-        this.timerOn = false;
+    toggleTimer() {
+        this.timerOn = !this.timerOn;
     }
 
     // Always decrements by 1 second
@@ -95,17 +99,28 @@ let pomodoro = new Pomodoro(countdown);
 let startButton = document.getElementById("start");
 
 startButton.addEventListener("click", function () {
-    let minuteStr = document.getElementById("work_timer_input").value;
-    let minutes = convertStrToNum(minuteStr);
-    hours = (minutes / MIN_IN_HOUR) | 0; // integer division
-    minutes -= hours * MIN_IN_HOUR
-    pomodoro.setTime(hours, minutes, 0)
+    if (pomodoro.timeIsSet) {
+        // If time is set and start is pressed again, reset
+        //pomodoro.toggleTimer();
+    } else {
+        let minuteStr = document.getElementById("work_timer_input").value;
+        let minutes = convertStrToNum(minuteStr);
+        hours = (minutes / MIN_IN_HOUR) | 0; // integer division
+        minutes -= hours * MIN_IN_HOUR;
+        pomodoro.setTime(hours, minutes, 0);
+        pomodoro.startTimer();;
+    }
 })
 
 let pauseButton = document.getElementById("pause");
 
 pauseButton.addEventListener("click", function () {
-    pomodoro.stopTimer();
+    pomodoro.toggleTimer();
+    if (pauseButton.textContent === PAUSE) {
+        pauseButton.textContent = RESUME;
+    } else {
+        pauseButton.textContent = PAUSE;
+    }
 })
 
 // Attach function to reset to given work and break times
