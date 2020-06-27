@@ -80,11 +80,15 @@ class Pomodoro {
                         self.clearTimer();
                     }
                 }
+                // TODO: bug, there is a second in between
+                // TODO: done counting keeps going
                 self._decrementTimer();
                 self._updateCountdownText();
             }
         }, MILLISECONDS);
-    };
+
+        console.log(this.timeInterval);
+    }
 
     toggleTimer() {
         if (this.msgEl.textContent !== PAUSED_MSG) {
@@ -108,8 +112,8 @@ class Pomodoro {
 
         this.msgEl.textContent = START_MSG;
         this._updateCountdownText();
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
+        if (this.timeInterval) {
+        clearInterval(this.timeInterval);
         }
     }
 
