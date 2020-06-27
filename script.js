@@ -12,6 +12,7 @@ const SEC = 0;
 const MAX_VALUE = 59;
 const MIN_IN_HOUR = 60;
 const SEC_IN_MIN = 60;
+const MILLISECONDS = 1000;
 
 // Timer buttons
 const START = "Start";
@@ -32,7 +33,7 @@ class Pomodoro {
         this.minutes = Math.min(m, MAX_VALUE);
         this.seconds = Math.min(s, MAX_VALUE);
         this.updateCountdownText();
-        this.timerOn = true;
+        this.startTimer();
     }
 
     getTime() {
@@ -46,8 +47,33 @@ class Pomodoro {
         this.countdownEl.textContent = h + ":" + m + ":" + s;
     }
 
+    startTimer() {
+        this.timerOn = true;
+        let self = this;
+        setInterval(function () {
+            self.decrementTimer();
+            self.updateCountdownText();
+        }, MILLISECONDS);
+    };
+
     stopTimer() {
         this.timerOn = false;
+    }
+
+    // Always decrements by 1 second
+    decrementTimer() {
+        if (this.seconds > 0) {
+            this.seconds -= 1;
+        } else if (this.minutes > 0) {
+            this.minutes -= 1;
+            this.seconds = MAX_VALUE;
+        } else if (this.hours > 0) {
+            this.hours -= 1;
+            this.minutes = MAX_VALUE;
+            this.seconds = MAX_VALUE;
+        } else {
+            return;
+        }
     }
 }
 
