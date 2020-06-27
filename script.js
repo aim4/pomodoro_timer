@@ -3,7 +3,7 @@
 const START_MSG = "Start Timer";
 const CONTINUE_MSG = "Continue Working";
 const BREAK_MSG = "Take a Break";
-const RESUME_MSG = "Resume Timer";
+const RESUME_MSG = "Paused Timer";
 
 // Time
 const HOUR = 0;
@@ -21,13 +21,10 @@ const RESUME = "Resume";
 const RESET = "Reset";
 
 class Pomodoro {
-    constructor(countdownEl) {
+    constructor(countdownEl, msgEl) {
         this.countdownEl = countdownEl;
-        this.hours = 0;
-        this.minutes = 0;
-        this.seconds = 0;
-        this.timerOn = false;
-        this.timeIsSet = false;
+        this.msgEl = msgEl;
+        this.clearTimer();
     }
 
     setTime(h, m, s) {
@@ -36,10 +33,6 @@ class Pomodoro {
         this.seconds = Math.min(s, MAX_VALUE);
         this.timeIsSet = true;
         this.updateCountdownText();
-    }
-
-    getTime() {
-        return [this.hours, this.minutes, this.seconds];
     }
 
     updateCountdownText() {
@@ -51,8 +44,10 @@ class Pomodoro {
 
     startTimer() {
         this.timerOn = true;
+        this.msgEl.textContent = CONTINUE_MSG;
+
         let self = this;
-        setInterval(function () {
+        this.timeInterval = setInterval(function () {
             if (self.timerOn) {
                 self.decrementTimer();
                 self.updateCountdownText();
@@ -61,7 +56,24 @@ class Pomodoro {
     };
 
     toggleTimer() {
+        if (this.msgEl.textContent === CONTINUE_MSG) {
+            this.msgEl.textContent = RESUME_MSG;
+        } else {
+            this.msgEl.textContent = CONTINUE_MSG;
+        }
         this.timerOn = !this.timerOn;
+    }
+
+    clearTimer() {
+        this.hours = 0;
+        this.minutes = 0;
+        this.seconds = 0;
+        this.timerOn = false;
+        this.timeIsSet = false;
+        this.updateCountdownText();
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
     }
 
     // Always decrements by 1 second
@@ -79,6 +91,10 @@ class Pomodoro {
             return;
         }
     }
+
+    getTime() {
+        return [this.hours, this.minutes, this.seconds];
+    }
 }
 
 function formatTimeNum(t) {
@@ -94,15 +110,13 @@ function convertStrToNum(s) {
 }
 // Attach function to countdown on play hit if timer_state is paused
 let countdown = document.getElementById("countdown");
-let pomodoro = new Pomodoro(countdown);
+let msg = document.getElementById("msg");
+let pomodoro = new Pomodoro(countdown, msg);
 
 let startButton = document.getElementById("start");
-
 startButton.addEventListener("click", function () {
-    if (pomodoro.timeIsSet) {
-        // If time is set and start is pressed again, reset
-        //pomodoro.toggleTimer();
-    } else {
+    if (!pomodoro.timeIsSet) {
+        // If time is set and start is pressed again, continue counting down?
         let minuteStr = document.getElementById("work_timer_input").value;
         let minutes = convertStrToNum(minuteStr);
         hours = (minutes / MIN_IN_HOUR) | 0; // integer division
@@ -113,7 +127,6 @@ startButton.addEventListener("click", function () {
 })
 
 let pauseButton = document.getElementById("pause");
-
 pauseButton.addEventListener("click", function () {
     pomodoro.toggleTimer();
     if (pauseButton.textContent === PAUSE) {
@@ -124,8 +137,7 @@ pauseButton.addEventListener("click", function () {
 })
 
 // Attach function to reset to given work and break times
-// --> Get work and break inputs
 let resetButton = document.getElementById("reset");
 resetButton.addEventListener("click", function () {
-    pomodoro.setTime(0, 0, 0)
+    pomodoro.clearTimer();
 })
