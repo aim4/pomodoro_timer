@@ -1,7 +1,8 @@
 // JavaScript source code
 //Timer messages
 const START_MSG = "Start Timer";
-const CONTINUE_MSG = "Continue Working";
+const CONTINUE_WORKING_MSG = "Continue Working";
+const CONTINUE_BREAK_MSG = "Contine Your Break";
 const BREAK_MSG = "Take a Break";
 const PAUSED_MSG = "Paused Timer";
 
@@ -53,13 +54,14 @@ class Pomodoro {
             this.minutes = MAX_VALUE;
             this.seconds = MAX_VALUE;
         } else {
+            console.log("done");
             this.doneCounting = true;
         }
     }
 
     startTimer() {
         this._setTime(this.workHours, this.workMinutes, this.workSeconds);
-        this.msgEl.textContent = CONTINUE_MSG;
+        this.msgEl.textContent = CONTINUE_WORKING_MSG;
         this.doneCounting = false;
         this.doneWorking = false;
         this.doneBreak = false;
@@ -75,7 +77,7 @@ class Pomodoro {
                         self.msgEl.textContent = BREAK_MSG;
                         self.doneCounting = false;
                     } else {
-                        self.doneBreak = true;
+                        self.clearTimer();
                     }
                 }
                 self._decrementTimer();
@@ -85,10 +87,12 @@ class Pomodoro {
     };
 
     toggleTimer() {
-        if (this.msgEl.textContent === CONTINUE_MSG) {
+        if (this.msgEl.textContent !== PAUSED_MSG) {
             this.msgEl.textContent = PAUSED_MSG;
-        } else {
-            this.msgEl.textContent = CONTINUE_MSG;
+        } else if (!this.doneWorking) {
+            this.msgEl.textContent = CONTINUE_WORKING_MSG;
+        } else if (!this.doneBreak) {
+            this.msgEl.textContent = CONTINUE_BREAK_MSG;
         }
         this.paused = !this.paused;
     }
