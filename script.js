@@ -154,7 +154,9 @@ function getHoursAndMinutesFromInput(inputEl) {
     return [hours, minutes]
 }
 
-// Attach function to countdown on play hit if timer_state is paused
+
+// Create Pomodoro Timer object
+// Attach timer functionality to start, pause, and reset buttons
 let countdown = document.getElementById("countdown");
 let msg = document.getElementById("msg");
 let pomodoro = new Pomodoro(countdown, msg);
