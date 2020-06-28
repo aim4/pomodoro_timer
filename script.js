@@ -70,6 +70,8 @@ class Pomodoro {
         this.timeInterval = setInterval(function () {
             // Todo: refactor
             if (!self.paused) {
+                self._decrementTimer();
+                self._updateCountdownText();
                 if (self.doneCounting) {
                     if (!self.doneWorking) {
                         self.doneWorking = true;
@@ -80,9 +82,6 @@ class Pomodoro {
                         self.clearTimer();
                     }
                 }
-                // TODO: bug, there is a second in between
-                self._decrementTimer();
-                self._updateCountdownText();
             }
         }, MILLISECONDS);
     }
