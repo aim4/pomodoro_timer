@@ -78,8 +78,10 @@ class Pomodoro {
                         self._setTime(self.breakHours, self.breakMinutes, self.breakSeconds);
                         self.msgEl.textContent = BREAK_MSG;
                         self.doneCounting = false;
+                        playSound("sounds/ting.mp3");
                     } else {
                         self.clearTimer();
+                        playSound("sounds/music_box.mp3");
                     }
                 }
             }
@@ -154,6 +156,11 @@ function getHoursAndMinutesFromInput(inputEl) {
     return [hours, minutes]
 }
 
+function playSound(path) {
+    var audio = new Audio(path);
+    audio.loop = false;
+    audio.play(); 
+}
 
 // Create Pomodoro Timer object
 // Attach timer functionality to start, pause, and reset buttons
